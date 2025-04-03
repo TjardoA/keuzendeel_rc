@@ -1,35 +1,39 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
-import './App.css'
+import React, { useState, useEffect } from "react";
+import { motion } from "framer-motion";
 
-function App() {
-  const [count, setCount] = useState(0)
+const ws = new WebSocket("ws://localhost:3000");
+
+const App = () => {
+  const [playing, setPlaying] = useState(false);
+
+  useEffect(() => {
+    ws.onmessage = (event) => {
+      if (event.data === "play") setPlaying(true);
+      if (event.data === "pause") setPlaying(false);
+    };
+  }, []);
+
+  const togglePlay = () => {
+    const action = playing ? "pause" : "play";
+    ws.send(action);
+    setPlaying(!playing);
+  };
 
   return (
-    <>
-      <div>
-        <a href="https://vite.dev" target="_blank">
-          <img src={viteLogo} className="logo" alt="Vite logo" />
-        </a>
-        <a href="https://react.dev" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
-      </div>
-      <h1>Vite + React</h1>
-      <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>
-          count is {count}
-        </button>
-        <p>
-          Edit <code>src/App.jsx</code> and save to test HMR
-        </p>
-      </div>
-      <p className="read-the-docs">
-        Click on the Vite and React logos to learn more
-      </p>
-    </>
-  )
-}
+    <div className="flex flex-col items-center justify-center h-screen bg-gray-900 text-white">
+      <motion.div
+        className="w-48 h-48 bg-black rounded-full border-4 border-gray-700"
+        animate={{ rotate: playing ? 360 : 0 }}
+        transition={{ repeat: Infinity, duration: 3, ease: "linear" }}
+      />
+      <button
+        onClick={togglePlay}
+        className="mt-6 px-4 py-2 bg-blue-500 rounded"
+      >
+        {playing ? "Pause" : "Play"}
+      </button>
+    </div>
+  );
+};
 
-export default App
+export default App;
