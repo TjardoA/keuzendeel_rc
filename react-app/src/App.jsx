@@ -1,39 +1,36 @@
-import React, { useState, useEffect } from "react";
-import { motion } from "framer-motion";
+import { useState, useEffect } from "react";
+import { io } from "socket.io-client";
+import "./App.css";
 
-const ws = new WebSocket("ws://localhost:3000");
+const socket = io("http://localhost:3000");
 
-const App = () => {
-  const [playing, setPlaying] = useState(false);
+function App() {
+  const [isPlaying, setIsPlaying] = useState(false);
 
   useEffect(() => {
-    ws.onmessage = (event) => {
-      if (event.data === "play") setPlaying(true);
-      if (event.data === "pause") setPlaying(false);
+    socket.on("play", () => setIsPlaying(true));
+    socket.on("pause", () => setIsPlaying(false));
+    return () => {
+      socket.off("play");
+      socket.off("pause");
     };
   }, []);
 
   const togglePlay = () => {
-    const action = playing ? "pause" : "play";
-    ws.send(action);
-    setPlaying(!playing);
+    if (isPlaying) {
+      socket.emit("pause");
+    } else {
+      socket.emit("play");
+    }
   };
 
   return (
-    <div className="flex flex-col items-center justify-center h-screen bg-gray-900 text-white">
-      <motion.div
-        className="w-48 h-48 bg-black rounded-full border-4 border-gray-700"
-        animate={{ rotate: playing ? 360 : 0 }}
-        transition={{ repeat: Infinity, duration: 3, ease: "linear" }}
-      />
-      <button
-        onClick={togglePlay}
-        className="mt-6 px-4 py-2 bg-blue-500 rounded"
-      >
-        {playing ? "Pause" : "Play"}
-      </button>
+    <div className="container">
+      <h1>Virtuele LP-speler</h1>
+      <div className={`lp ${isPlaying ? "active" : "paused"}`}></div>
+      <button onClick={togglePlay}>{isPlaying ? "Pauze" : "Start"}</button>
     </div>
   );
-};
+}
 
 export default App;

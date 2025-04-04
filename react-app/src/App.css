@@ -1,24 +1,37 @@
-#root {
-  max-width: 1280px;
-  margin: 0 auto;
-  padding: 2rem;
+body {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+  background-color: #222;
+  color: white;
+  flex-direction: column;
+  font-family: Arial, sans-serif;
+}
+
+.container {
   text-align: center;
+  position: relative;
 }
 
-.logo {
-  height: 6em;
-  padding: 1.5em;
-  will-change: filter;
-  transition: filter 300ms;
-}
-.logo:hover {
-  filter: drop-shadow(0 0 2em #646cffaa);
-}
-.logo.react:hover {
-  filter: drop-shadow(0 0 2em #61dafbaa);
+.lp {
+  width: 400px;
+  height: 400px;
+  background: url("/plaat.png") no-repeat center/cover;
+  border-radius: 50%;
+  margin: 20px auto;
+  animation: spin 3s linear infinite;
 }
 
-@keyframes logo-spin {
+.active {
+  animation-play-state: running;
+}
+
+.paused {
+  animation-play-state: paused;
+}
+
+@keyframes spin {
   from {
     transform: rotate(0deg);
   }
@@ -27,16 +40,31 @@
   }
 }
 
-@media (prefers-reduced-motion: no-preference) {
-  a:nth-of-type(2) .logo {
-    animation: logo-spin infinite 20s linear;
-  }
+.tonearm {
+  width: 100px;
+  height: 10px;
+  background-color: silver;
+  position: absolute;
+  right: -50px;
+  top: 50px;
+  transform-origin: right center;
+  transition: transform 0.5s ease-in-out;
 }
 
-.card {
-  padding: 2em;
+.tonearm.active {
+  transform: rotate(-30deg);
 }
 
-.read-the-docs {
-  color: #888;
+button {
+  padding: 10px 20px;
+  font-size: 16px;
+  border: none;
+  cursor: pointer;
+  background-color: #ff4500;
+  color: white;
+  border-radius: 5px;
+}
+
+button:hover {
+  background-color: #ff6347;
 }
