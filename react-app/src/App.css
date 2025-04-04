@@ -41,18 +41,21 @@ body {
 }
 
 .tonearm {
-  width: 100px;
-  height: 10px;
-  background-color: silver;
+  width: 150px;
   position: absolute;
-  right: -50px;
-  top: 50px;
-  transform-origin: right center;
-  transition: transform 0.5s ease-in-out;
+  right: -20px;
+  top: 40px;
+  transform-origin: top right;
+  transition: transform 0.8s cubic-bezier(0.25, 1, 0.5, 1.2);
+  transform: rotate(-45deg);
+  z-index: 2;
 }
 
 .tonearm.active {
-  transform: rotate(-30deg);
+  transform: rotate(-15deg);
+}
+.tonearm.active-delayed {
+  transition: transform 0.8s ease-in-out 0.3s;
 }
 
 button {
@@ -67,4 +70,51 @@ button {
 
 button:hover {
   background-color: #ff6347;
+}
+
+.deezer-container {
+  text-align: center;
+  margin-top: 30px;
+}
+
+.search-input {
+  padding: 10px;
+  width: 250px;
+  font-size: 16px;
+  margin-right: 10px;
+}
+
+.search-btn {
+  padding: 10px;
+  cursor: pointer;
+  font-size: 16px;
+}
+
+.albums {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  margin-top: 20px;
+}
+
+.album-item {
+  margin: 10px;
+  padding: 10px;
+  border: 1px solid #ddd;
+  cursor: pointer;
+  border-radius: 8px;
+  text-align: center;
+}
+
+.album-cover {
+  width: 150px;
+  border-radius: 8px;
+}
+
+.tracks {
+  margin-top: 20px;
+}
+
+.track-item {
+  margin-bottom: 10px;
 }
