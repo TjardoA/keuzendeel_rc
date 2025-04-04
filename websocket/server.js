@@ -1,22 +1,25 @@
-const WebSocket = require("ws");
-const wss = new WebSocket.Server({ port: 3000 });
-
-wss.on("connection", (ws) => {
-  console.log("Client connected");
-
-  ws.on("message", (message) => {
-    console.log(`Received: ${message}`);
-    // Stuur het bericht door naar alle clients (broadcast)
-    wss.clients.forEach((client) => {
-      if (client.readyState === WebSocket.OPEN) {
-        client.send(message);
-      }
-    });
-  });
-
-  ws.on("close", () => {
-    console.log("Client disconnected");
-  });
+const { Server } = require("socket.io");
+const io = new Server(3000, {
+  cors: {
+    origin: "http://localhost:5173",
+    methods: ["GET", "POST"],
+  },
 });
 
-console.log("WebSocket server running on ws://localhost:3000");
+io.on("connection", (socket) => {
+  console.log("Een gebruiker is verbonden");
+
+  socket.on("play", () => {
+    io.emit("play");
+    console.log("LP afspelen");
+  });
+
+  socket.on("pause", () => {
+    io.emit("pause");
+    console.log("LP pauzeren");
+  });
+
+  socket.on("disconnect", () => {
+    console.log("Gebruiker is verbroken");
+  });
+});
