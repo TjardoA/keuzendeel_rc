@@ -9,6 +9,7 @@ const socket = io("http://localhost:3000");
 
 function App() {
   const [isPlaying, setIsPlaying] = useState(false);
+  const [albums, setAlbums] = useState([]); // Opgeheven state
 
   useEffect(() => {
     socket.on("play", () => setIsPlaying(true));
@@ -24,26 +25,27 @@ function App() {
   };
 
   return (
-    <div className="container">
-      <h1>Virtuele LP-speler</h1>
-
-      {/* LP-speler */}
-      <div className="player">
-        <img
-          src={tonearmImage}
-          alt="Tonearm"
-          className={`tonearm ${isPlaying ? "active" : ""}`}
-        />
-        <img
-          src={plaatImage}
-          alt="LP plaat"
-          className={`lp ${isPlaying ? "active" : "paused"}`}
-        />
+    <div className="main-container">
+      <div className={`player-container ${albums.length > 0 ? "blurred" : ""}`}>
+        <h1>Virtuele LP-speler</h1>
+        <div className="turntable">
+          <img
+            src={plaatImage}
+            alt="LP plaat"
+            className={`lp ${isPlaying ? "active" : "paused"}`}
+          />
+          <img
+            src={tonearmImage}
+            alt="Tonearm"
+            className={`tonearm ${isPlaying ? "active" : ""}`}
+          />
+        </div>
+        <button onClick={togglePlay}>{isPlaying ? "Pauze" : "Start"}</button>
       </div>
-      <button onClick={togglePlay}>{isPlaying ? "Pauze" : "Start"}</button>
 
-      {/* ✅ Deezer muziekzoeker */}
-      <DeezerPlayer />
+      <div className="search-container">
+        <DeezerPlayer albums={albums} setAlbums={setAlbums} />
+      </div>
     </div>
   );
 }

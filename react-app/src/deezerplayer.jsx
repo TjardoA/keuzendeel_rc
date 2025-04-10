@@ -1,23 +1,22 @@
 import { useState } from "react";
+import axios from "axios";
 
-const DeezerPlayer = () => {
+const DeezerPlayer = ({ albums, setAlbums }) => {
   const [search, setSearch] = useState("");
-  const [albums, setAlbums] = useState([]);
   const [tracks, setTracks] = useState([]);
   const [selectedAlbum, setSelectedAlbum] = useState(null);
   const [error, setError] = useState(null);
 
-  // 🔍 Zoek albums op Deezer
   const searchAlbums = async () => {
     if (!search.trim()) return;
 
     try {
-      const response = await fetch(
-        `https://cors-anywhere.herokuapp.com/https://api.deezer.com/search/album?q=${encodeURIComponent(
-          search
-        )}`
+      const response = await axios.get(
+        `http://localhost:5000/search?q=${search}`
       );
-      const data = await response.json();
+      const data = response.data;
+      console.log(data);
+
       if (data?.data?.length) {
         setAlbums(data.data);
         setError(null);
@@ -33,76 +32,72 @@ const DeezerPlayer = () => {
 
   const fetchTracks = async (albumId) => {
     try {
-      const response = await fetch(
-        `https://cors-anywhere.herokuapp.com/https://api.deezer.com/album/${albumId}`
+      const response = await axios.get(
+        `http://localhost:5000/album/${albumId}`
       );
-      const data = await response.json();
-      setTracks(data.tracks.data || []);
-      setSelectedAlbum(data);
-      setError(null);
+      setSelectedAlbum(response.data);
+      setTracks(response.data.tracks.data);
     } catch (err) {
       console.error(err);
-      setError("Fout bij het ophalen van tracks.");
+      setError("Fout bij het ophalen van nummers.");
     }
   };
 
+  const handleBack = () => {
+    setAlbums([]);
+    setTracks([]);
+    setSelectedAlbum(null);
+    setError(null);
+  };
+
   return (
-    <div style={{ textAlign: "center", fontFamily: "Arial, sans-serif" }}>
-      <h2>🎶 Zoek een album op Deezer</h2>
+    <div className="deezer-container">
+      {(albums.length > 0 || selectedAlbum) && (
+        <button onClick={handleBack} className="back-button">
+          Terug
+        </button>
+      )}
+
+      <h2>Zoek een album</h2>
 
       <input
         type="text"
         value={search}
         onChange={(e) => setSearch(e.target.value)}
         placeholder="Voer een artiest of album in..."
-        style={{ padding: "10px", width: "300px", fontSize: "16px" }}
+        className="search-input"
       />
-      <button
-        onClick={searchAlbums}
-        style={{ marginLeft: "10px", padding: "10px", cursor: "pointer" }}
-      >
-        Zoek 🔍
+      <button onClick={searchAlbums} className="search-button">
+        Zoek
       </button>
 
-      {error && <p style={{ color: "red", marginTop: "10px" }}>{error}</p>}
+      {error && <p className="error-text">{error}</p>}
 
-      <div style={{ marginTop: "20px" }}>
+      <div className="album-list-horizontal">
         {albums.map((album) => (
           <div
             key={album.id}
             onClick={() => fetchTracks(album.id)}
-            style={{
-              display: "inline-block",
-              margin: "10px",
-              padding: "10px",
-              border: "1px solid #ddd",
-              cursor: "pointer",
-              borderRadius: "8px",
-              width: "180px",
-            }}
+            className="album-item"
           >
             <img
-              src={album.cover_medium}
+              src={`https://e-cdns-images.dzcdn.net/images/cover/${album.md5_image}/500x500.jpg`}
               alt={album.title}
-              width="150"
-              height="150"
-              style={{ borderRadius: "6px" }}
+              className="album-cover"
             />
-            <p style={{ fontWeight: "bold" }}>{album.title}</p>
-            <p style={{ fontSize: "14px", color: "#555" }}>
-              {album.artist.name}
-            </p>
+            <p className="album-title">{album.title}</p>
+            <p className="album-artist">{album.artist.name}</p>
           </div>
         ))}
       </div>
 
       {selectedAlbum && (
-        <div style={{ marginTop: "30px" }}>
+        <div className="selected-album">
           <h3>
-            🎵 {selectedAlbum.title} - {selectedAlbum.artist.name}
+            {selectedAlbum.title} - {selectedAlbum.artist.name}
           </h3>
           {tracks.map((track) => (
-            <div key={track.id} style={{ marginBottom: "15px" }}>
+            <div key={track.id} className="track-item">
               <p>{track.title}</p>
               <audio controls>
                 <source src={track.preview} type="audio/mpeg" />

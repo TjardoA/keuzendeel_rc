@@ -1,25 +1,42 @@
+html,
 body {
-  display: flex;
-  justify-content: center;
-  align-items: center;
   height: 100vh;
-  background-color: #222;
+  margin: 0;
+  padding: 0;
+  background-color: #121212;
   color: white;
-  flex-direction: column;
   font-family: Arial, sans-serif;
 }
 
-.container {
-  text-align: center;
+.main-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 100px;
+  flex-wrap: wrap;
+  padding: 20px;
+}
+
+.player-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
   position: relative;
 }
 
+.turntable {
+  position: relative;
+  width: min(90vw, 350px);
+  height: min(90vw, 350px);
+  margin: 30px auto;
+}
+
 .lp {
-  width: 400px;
-  height: 400px;
-  background: url("/plaat.png") no-repeat center/cover;
+  width: 100%;
+  height: 100%;
   border-radius: 50%;
-  margin: 20px auto;
+  object-fit: cover;
+  box-shadow: 0 0 25px rgba(255, 255, 255, 0.1);
   animation: spin 3s linear infinite;
 }
 
@@ -41,10 +58,10 @@ body {
 }
 
 .tonearm {
-  width: 150px;
   position: absolute;
-  right: -20px;
-  top: 40px;
+  width: 40%;
+  top: 18%;
+  left: 30%;
   transform-origin: top right;
   transition: transform 0.8s cubic-bezier(0.25, 1, 0.5, 1.2);
   transform: rotate(-45deg);
@@ -54,40 +71,75 @@ body {
 .tonearm.active {
   transform: rotate(-15deg);
 }
+
 .tonearm.active-delayed {
   transition: transform 0.8s ease-in-out 0.3s;
 }
 
 button {
-  padding: 10px 20px;
+  padding: 12px 24px;
   font-size: 16px;
   border: none;
   cursor: pointer;
-  background-color: #ff4500;
+  background: linear-gradient(135deg, #ff4500, #ff6347);
   color: white;
-  border-radius: 5px;
+  border-radius: 6px;
+  box-shadow: 0 8px 15px rgba(0, 0, 0, 0.5);
+  transition: background 0.3s ease, box-shadow 0.3s ease;
+  margin-top: 10px;
 }
 
 button:hover {
-  background-color: #ff6347;
+  background: linear-gradient(135deg, #ff6347, #ff7f50);
+  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.6);
+}
+
+.search-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.container {
+  text-align: center;
+  position: relative;
+  max-width: 1200px;
+  width: 100%;
 }
 
 .deezer-container {
-  text-align: center;
-  margin-top: 30px;
+  margin-top: 50px;
+  padding: 20px;
+  background-color: #333;
+  border-radius: 12px;
+  box-shadow: 0 0 15px rgba(0, 0, 0, 0.5);
+  width: 90%;
+  max-width: 800px;
 }
 
 .search-input {
-  padding: 10px;
+  padding: 12px;
   width: 250px;
   font-size: 16px;
   margin-right: 10px;
+  border-radius: 5px;
+  border: 1px solid #666;
+  background-color: #1e1e1e;
+  color: white;
 }
 
 .search-btn {
-  padding: 10px;
+  padding: 12px 20px;
   cursor: pointer;
   font-size: 16px;
+  background-color: #ff4500;
+  color: white;
+  border: none;
+  border-radius: 5px;
+}
+
+.search-btn:hover {
+  background-color: #ff6347;
 }
 
 .albums {
@@ -98,23 +150,97 @@ button:hover {
 }
 
 .album-item {
-  margin: 10px;
-  padding: 10px;
-  border: 1px solid #ddd;
+  margin: 15px;
+  padding: 15px;
+  border: 1px solid #444;
   cursor: pointer;
-  border-radius: 8px;
-  text-align: center;
+  border-radius: 10px;
+  background-color: #2b2b2b;
+  box-shadow: 0 0 8px rgba(255, 255, 255, 0.05);
+  transition: transform 0.2s ease;
+  width: 160px;
+}
+
+.album-item:hover {
+  transform: scale(1.05);
+  border-color: #ff4500;
 }
 
 .album-cover {
-  width: 150px;
+  width: 130px;
+  height: 130px;
   border-radius: 8px;
+  object-fit: cover;
+  margin-bottom: 10px;
 }
 
 .tracks {
-  margin-top: 20px;
+  margin-top: 30px;
+  text-align: left;
 }
 
 .track-item {
-  margin-bottom: 10px;
+  background-color: #1e1e1e;
+  margin-bottom: 15px;
+  padding: 10px;
+  border-radius: 6px;
+  box-shadow: 0 0 5px rgba(255, 255, 255, 0.05);
+}
+
+.blurred {
+  filter: blur(8px);
+  transition: filter 0.3s ease-in-out;
+}
+
+.album-list-horizontal {
+  display: flex;
+  overflow-x: auto;
+  gap: 1rem;
+  padding: 1rem 0;
+  scroll-behavior: smooth;
+}
+
+.album-list-horizontal::-webkit-scrollbar {
+  height: 8px;
+}
+
+.album-list-horizontal::-webkit-scrollbar-thumb {
+  background-color: #555;
+  border-radius: 4px;
+}
+
+.back-button {
+  padding: 10px 18px;
+  font-size: 14px;
+  background-color: #444;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  margin-bottom: 15px;
+  transition: background 0.3s ease;
+}
+
+.back-button:hover {
+  background-color: #666;
+}
+
+/* 🔽 Responsiveness */
+@media (max-width: 768px) {
+  .main-container {
+    flex-direction: column;
+    gap: 50px;
+    padding: 20px;
+  }
+
+  .turntable {
+    width: 80vw;
+    height: 80vw;
+  }
+
+  .tonearm {
+    top: 16%;
+    left: 32%;
+    width: 45%;
+  }
 }
