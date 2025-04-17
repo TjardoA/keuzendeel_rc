@@ -1,4 +1,5 @@
 const { Server } = require("socket.io");
+
 const io = new Server(3000, {
   cors: {
     origin: "http://localhost:5173",
@@ -17,6 +18,11 @@ io.on("connection", (socket) => {
   socket.on("pause", () => {
     io.emit("pause");
     console.log("LP pauzeren");
+  });
+
+  socket.on("selectTrack", (track) => {
+    io.emit("selectTrack", track);
+    console.log(`Track geselecteerd: ${track.title}`);
   });
 
   socket.on("disconnect", () => {
