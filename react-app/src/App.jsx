@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { io } from "socket.io-client";
 import "./App.css";
 import plaatImage from "../public/plaat.png";
@@ -9,11 +9,20 @@ const socket = io("http://localhost:3000");
 
 function App() {
   const [isPlaying, setIsPlaying] = useState(false);
-  const [albums, setAlbums] = useState([]); // Opgeheven state
+  const [albums, setAlbums] = useState([]);
+  const deezerPlayerRef = useRef(null);
 
   useEffect(() => {
-    socket.on("play", () => setIsPlaying(true));
-    socket.on("pause", () => setIsPlaying(false));
+    socket.on("play", () => {
+      setIsPlaying(true);
+      deezerPlayerRef.current?.play();
+    });
+
+    socket.on("pause", () => {
+      setIsPlaying(false);
+      deezerPlayerRef.current?.pause();
+    });
+
     return () => {
       socket.off("play");
       socket.off("pause");
@@ -44,7 +53,12 @@ function App() {
       </div>
 
       <div className="search-container">
-        <DeezerPlayer albums={albums} setAlbums={setAlbums} />
+        <DeezerPlayer
+          ref={deezerPlayerRef}
+          albums={albums}
+          setAlbums={setAlbums}
+          socket={socket}
+        />
       </div>
     </div>
   );

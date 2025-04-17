@@ -1,11 +1,32 @@
-import { useState } from "react";
+import {
+  useState,
+  useRef,
+  forwardRef,
+  useImperativeHandle,
+  useEffect,
+} from "react";
 import axios from "axios";
 
-const DeezerPlayer = ({ albums, setAlbums }) => {
+const DeezerPlayer = forwardRef(({ albums, setAlbums, socket }, ref) => {
   const [search, setSearch] = useState("");
   const [tracks, setTracks] = useState([]);
   const [selectedAlbum, setSelectedAlbum] = useState(null);
+  const [selectedTrack, setSelectedTrack] = useState(null);
   const [error, setError] = useState(null);
+  const audioRef = useRef(null);
+
+  useImperativeHandle(ref, () => ({
+    play() {
+      if (audioRef.current) {
+        audioRef.current.play();
+      }
+    },
+    pause() {
+      if (audioRef.current) {
+        audioRef.current.pause();
+      }
+    },
+  }));
 
   const searchAlbums = async () => {
     if (!search.trim()) return;
@@ -15,7 +36,6 @@ const DeezerPlayer = ({ albums, setAlbums }) => {
         `http://localhost:5000/search?q=${search}`
       );
       const data = response.data;
-      console.log(data);
 
       if (data?.data?.length) {
         setAlbums(data.data);
@@ -30,23 +50,30 @@ const DeezerPlayer = ({ albums, setAlbums }) => {
     }
   };
 
-  const fetchTracks = async (albumId) => {
-    try {
-      const response = await axios.get(
-        `http://localhost:5000/album/${albumId}`
-      );
-      setSelectedAlbum(response.data);
-      setTracks(response.data.tracks.data);
-    } catch (err) {
-      console.error(err);
-      setError("Fout bij het ophalen van nummers.");
+  const selectTrack = (track) => {
+    setSelectedTrack(track);
+    if (socket) {
+      socket.emit("selectTrack", track);
     }
   };
+
+  useEffect(() => {
+    if (!socket) return;
+
+    socket.on("selectTrack", (track) => {
+      setSelectedTrack(track);
+    });
+
+    return () => {
+      socket.off("selectTrack");
+    };
+  }, [socket]);
 
   const handleBack = () => {
     setAlbums([]);
     setTracks([]);
     setSelectedAlbum(null);
+    setSelectedTrack(null);
     setError(null);
   };
 
@@ -77,8 +104,10 @@ const DeezerPlayer = ({ albums, setAlbums }) => {
         {albums.map((album) => (
           <div
             key={album.id}
-            onClick={() => fetchTracks(album.id)}
-            className="album-item"
+            onClick={() => selectTrack(album)}
+            className={`album-item ${
+              selectedTrack?.id === album.id ? "selected" : ""
+            }`}
           >
             <img
               src={`https://e-cdns-images.dzcdn.net/images/cover/${album.md5_image}/500x500.jpg`}
@@ -91,24 +120,11 @@ const DeezerPlayer = ({ albums, setAlbums }) => {
         ))}
       </div>
 
-      {selectedAlbum && (
-        <div className="selected-album">
-          <h3>
-            {selectedAlbum.title} - {selectedAlbum.artist.name}
-          </h3>
-          {tracks.map((track) => (
-            <div key={track.id} className="track-item">
-              <p>{track.title}</p>
-              <audio controls>
-                <source src={track.preview} type="audio/mpeg" />
-                Je browser ondersteunt geen audio-element.
-              </audio>
-            </div>
-          ))}
-        </div>
+      {selectedTrack && selectedTrack.preview && (
+        <audio ref={audioRef} src={selectedTrack.preview} />
       )}
     </div>
   );
-};
+});
 
 export default DeezerPlayer;
